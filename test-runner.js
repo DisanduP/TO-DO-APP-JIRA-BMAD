@@ -5,6 +5,7 @@ function createTodoModule() {
   return {
     getTasks: () => tasks,
     add: (t) => { tasks.push({ text: t, done: false }); },
+  addWithDate: (t,d) => { tasks.push({ text: t, done: false, dueDate: d }); },
     toggle: (i) => { if (tasks[i]) tasks[i].done = !tasks[i].done; },
     clear: () => { tasks = []; }
   };
@@ -29,6 +30,12 @@ function run() {
   mod.clear();
   const tasks3 = mod.getTasks();
   console.log('after clear:', tasks3.length === 0 ? 'PASS' : 'FAIL', tasks3);
+
+  // Test 4: add with due date
+  mod.clear();
+  mod.addWithDate('Task C','2025-11-05');
+  const tasks4 = mod.getTasks();
+  console.log('addWithDate:', (tasks4.length===1 && tasks4[0].dueDate==='2025-11-05') ? 'PASS' : 'FAIL', tasks4);
 }
 
 try { run(); } catch (e) { console.error(e); process.exit(1); }

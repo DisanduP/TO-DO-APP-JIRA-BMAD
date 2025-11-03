@@ -1,0 +1,11 @@
+{
+    "name": "bmad-todo-app",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "sirv-cli": "^2.0.0"
+    }
+}

@@ -13,8 +13,9 @@
 <body>
   <h1>BMAD Todo App - Minimal</h1>
   <form id="form">
-    <input id="task" placeholder="New task" />
-    <button>Add</button>
+  <input id="task" placeholder="New task" />
+  <input id="due" type="date" />
+  <button>Add</button>
   </form>
   <ul id="list"></ul>
 
@@ -23,6 +24,11 @@
     const taskInput = document.getElementById('task');
     const list = document.getElementById('list');
     let tasks = [];
+    const STORAGE_KEY = 'bmad_todo_tasks_v1';
+    function load() {
+      try { const raw = localStorage.getItem(STORAGE_KEY); tasks = raw ? JSON.parse(raw) : []; } catch(e){ tasks = []; }
+    }
+    function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch(e){} }
 
     function render() {
       list.innerHTML = '';
@@ -32,18 +38,25 @@
         const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = t.done;
         cb.addEventListener('change', () => { tasks[i].done = cb.checked; render(); });
         const span = document.createElement('span'); span.textContent = t.text;
+        if (t.dueDate) {
+          const d = document.createElement('small'); d.style.marginLeft = '8px'; d.textContent = `(due: ${t.dueDate})`;
+          span.appendChild(d);
+        }
         const del = document.createElement('button'); del.textContent = '✖'; del.addEventListener('click', () => { tasks.splice(i,1); render(); });
         li.appendChild(cb); li.appendChild(span); li.appendChild(del);
         list.appendChild(li);
       })
+      save();
     }
 
-    form.addEventListener('submit', (e) => { e.preventDefault(); if(taskInput.value.trim()){ tasks.push({text:taskInput.value.trim(), done:false}); taskInput.value=''; render(); } });
+  const dueInput = document.getElementById('due');
+  form.addEventListener('submit', (e) => { e.preventDefault(); if(taskInput.value.trim()){ tasks.push({text:taskInput.value.trim(), done:false, dueDate: dueInput.value || null}); taskInput.value=''; dueInput.value=''; render(); } });
 
-    // Expose for tests
-    window.__bmad_todo = { getTasks: () => tasks, add: (t)=>{ tasks.push({text:t, done:false}); render(); }, toggle: (i)=>{ tasks[i].done = !tasks[i].done; render(); }, clear: ()=>{ tasks = []; render(); } };
+  // Expose for tests
+  window.__bmad_todo = { getTasks: () => tasks, add: (t)=>{ tasks.push({text:t, done:false}); render(); }, addWithDate: (t,d)=>{ tasks.push({text:t, done:false, dueDate:d}); render(); }, toggle: (i)=>{ tasks[i].done = !tasks[i].done; render(); }, clear: ()=>{ tasks = []; render(); } };
 
-    render();
+  load();
+  render();
   </script>
 </body>
 </html>
